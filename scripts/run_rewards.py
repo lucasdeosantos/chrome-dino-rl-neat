@@ -1,12 +1,11 @@
 import subprocess
 import sys
 from pathlib import Path
-from src.game.config import SCENARIOS
-from src.training.rewards import REWARDS
-
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from src.game.config import SCENARIOS
+from src.training.rewards import REWARDS
 
 TIMESTEPS = 1000000
 

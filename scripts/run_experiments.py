@@ -2,12 +2,11 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-from src.training.config import SEED
-from src.game.config import SCENARIOS
-
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from src.training.config import SEED
+from src.game.config import SCENARIOS
 
 
 def main(argv=None):
