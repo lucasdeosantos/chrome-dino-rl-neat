@@ -1,0 +1,13 @@
+# Game graphics
+pygame==2.6.1
+
+# Gymnasium 
+gymnasium==1.4.0
+numpy==2.4.6
+
+# PPO and DQN 
+stable-baselines3==2.9.2
+torch==2.15.0
+
+# NEAT
+neat-python==1.1.0
