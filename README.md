@@ -1,6 +1,6 @@
 # Chrome Dino: Treinamento e Avaliação de agentes com RL e NEAT
 
-Jogo do dinossauro do chrome adaptado para treinar e avaliar agentes com PPO, DQN e NEAT.
+Uma adaptação do jogo do dinossauro do chrome para treinar e avaliar agentes com PPO, DQN e NEAT.
 
 ## Instalação
 
@@ -56,7 +56,7 @@ O ambiente oferece três ações distintas:
 | 1 | Pular |
 | 2 | Agachar |
 
-Para padronizar o tamanho do pulo, foram removidas do jogo a descida rápida e a variação da altura do salto conforme o tempo em que o botão fica pressionado. O pulo tem sempre a mesma altura e duração.
+Para padronizar o tamanho do pulo, foram removidas do jogo a descida rápida e a variação de altura do salto conforme o tempo em que o botão fica pressionado.
 
 ### Estrutura da observação
 
@@ -101,9 +101,9 @@ Cada partida termina por colisão ou ao atingir o limite de passos.
 
 ### Escolha do melhor modelo
 
-O melhor modelo (`best`) é o de maior pontuação no treino. Se mais de um modelo atingir a pontuação máxima, o mais recente vira o melhor.
+O melhor modelo (`best.zip`/`best.pkl`) é o de maior pontuação no treino. Se mais de um modelo atingirem a pontuação máxima, o mais recente vira o melhor.
 
-No NEAT, `last.pkl` guarda o melhor indivíduo da última geração. No PPO e no DQN, `last.zip` guarda a rede ao final do treinamento.
+No PPO e no DQN, `last.zip` guarda a rede ao final do treinamento. No NEAT, `last.pkl` guarda o melhor indivíduo da última geração.
 
 ## Treino (`train.py`)
 
@@ -113,12 +113,10 @@ python train.py --agent dqn  --scenario 1 --output models/dqn-new-model
 python train.py --agent neat --scenario 1 --output models/neat-new-model
 ```
 
-Use uma pasta de saída nova ou vazia.
-
 | Opção | Descrição |
 |---|---|
 | `--agent [ppo, dqn, neat]` | Algoritmo do modelo |
-| `--scenario [1, 2, 3, 4]` | Cenário (padrão: 4) |
+| `--scenario [1, 2, 3, 4]` | Cenário |
 | `--output PASTA` | Pasta de saída do modelo |
 | `--seed N` | Semente aleatória do algoritmo (padrão: 42) |
 | `--timesteps N` | Passos do PPO/DQN (padrão: 10 milhões) |
@@ -132,7 +130,20 @@ Use uma pasta de saída nova ou vazia.
 
 Hiperparâmetros do RL ficam em `src/training/config.py`, a configuração do NEAT fica em `neat_config.txt`.
 
-As funções de recompensa são definidas em `src/training/rewards.py`. O NEAT usa a pontuação da partida como fitness e não é afetado por `--reward`.
+### Funções de Recompensa
+
+As funções de recompensa são definidas em `src/training/rewards.py`. O NEAT usa a pontuação da partida como *fitness* e não é afetado por `--reward`.
+
+A função de recompensa padrão $r_1$ incentiva o agente a sobreviver pelo maior tempo possível, evitando colisões e ações desnecessárias.
+
+$$
+r_1 = 0{,}1 \cdot s - 5 \cdot c - 0{,}01 \cdot a
+$$
+
+Onde:
+- $s$ (steps): número de passos sobrevividos (equivalente a pontuação).
+- $c$ (collision): indica se ocorreu uma colisão (0 ou 1).
+- $a$ (actions): número de ações de pular ou agachar.
 
 ### Retomada e pré-treinamento
 
@@ -140,19 +151,22 @@ As funções de recompensa são definidas em `src/training/rewards.py`. O NEAT u
 python train.py --resume models/dqn/s2/seed42
 python train.py --agent dqn --pretrained models/dqn/s2/seed42/best.zip --scenario 4 --timesteps 1000000 --output models/dqn/s4/from-s2
 ```
+- **Retomada** (`--resume`): permite continuar um treinamento interrompido a partir do checkpoint.
+- **Pré-treinamento** (`--pretrained`): permite utilizar um modelo previamente treinado como ponto de partida para o treinamento em outro cenário.
 
 ## Avaliação (`evaluate.py`)
 
 ```bash
-python evaluate.py --agent ppo  --model models/ppo-novo/best.zip --scenario 1
-python evaluate.py --agent neat --model models/neat-novo/best.pkl --scenario 1 --render 2x
+python evaluate.py --agent ppo  --model models/ppo-new-model/best.zip --scenario 1
+python evaluate.py --agent neat --model models/neat-new-model/best.pkl --scenario 1 --render 2x
 ```
 
 | Opção | Descrição |
 |---|---|
 | `--agent [ppo, dqn, neat]` | Algoritmo do modelo |
-| `--scenario [1, 2, 3, 4]` | Cenário (padrão: 4) |
+| `--scenario [1, 2, 3, 4]` | Cenário |
 | `--model ARQUIVO` | Modelo (`best.zip`/`best.pkl` ou `last.zip`/`last.pkl`) |
+| `--max-steps` | Limite de passos por partida (padrão: 36000 = 10 min simulados) |
 | `--render [normal\|2x\|4x\|8x]` | Visualização gráfica da avaliação |
 
 ## Experimentos
