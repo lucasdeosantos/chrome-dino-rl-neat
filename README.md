@@ -18,7 +18,7 @@ python -m pip install -r requirements.txt
 ```bash
 python play.py
 python play.py --scenario 2
-python play.py --versus models/neat/s3/seed42/best.pkl --scenario 3
+python play.py --versus models/neat/s3/best.pkl --scenario 3
 ```
 
 | Opção | Descrição |
