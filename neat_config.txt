@@ -3,7 +3,7 @@ fitness_criterion     = max
 fitness_threshold     = 500
 # The fitness threshold is ignored. train.py completes the generation budget.
 no_fitness_termination = True
-pop_size              = 50
+pop_size              = 100
 reset_on_extinction   = False
 
 [DefaultGenome]

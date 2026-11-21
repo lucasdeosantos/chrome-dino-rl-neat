@@ -122,8 +122,8 @@ python train.py --agent neat --scenario 1 --output models/neat-new-model
 | `--timesteps N` | Passos do PPO/DQN (padrão: 10 milhões) |
 | `--reward [r1..r9]` | Função de recompensa do PPO/DQN (padrão: r1) |
 | `--generations N` | Gerações do NEAT (padrão: 100) |
-| `--population N` | Tamanho da população do NEAT (padrão: 50) |
-| `--max-steps N` | Limite de passos por partida (padrão: 36000 = 10 min simulados) |
+| `--population N` | Tamanho da população do NEAT (padrão: 100) |
+| `--max-steps N` | Limite de passos por partida (padrão: 36 mil passos = 10 minutos simulados) |
 | `--stop-at-max-steps` | Encerra o treino quando um modelo atinge o limite definido em --max-steps. No NEAT, conclui a geração antes de encerrar |
 | `--resume PASTA` | Continua um treino interrompido com os mesmos parâmetros |
 | `--pretrained PASTA` | Novo treino a partir de um modelo do mesmo algoritmo, exige uma nova pasta de saída |
@@ -170,14 +170,13 @@ python evaluate.py --agent neat --model models/neat-new-model/best.pkl --scenari
 ## Experimentos
 
 ```bash
-python scripts/run_experiments.py        # treina com a semente padrão
-python scripts/run_experiments.py 67     # treina com a semente fornecida pelo usuário
+python scripts/run_experiments.py
 python scripts/run_rewards.py
 ```
 
 - `run_experiments.py`: executa o treinamento e a avaliação dos algoritmos NEAT, DQN e PPO nos quatro cenários, utilizando as configurações padrão.
 
-- `run_rewards.py`: executa o treinamento dos algoritmos DQN e PPO nos quatro cenários, utilizando cada uma das funções de recompensa definidas em `src/training/rewards.py`.
+- `run_rewards.py`: executa o treinamento e a avaliação dos algoritmos DQN e PPO nos quatro cenários, utilizando cada uma das funções de recompensa definidas em `src/training/rewards.py` e as configurações padrão.
 
 ## Resultados e arquivos gerados
 

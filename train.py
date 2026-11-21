@@ -29,7 +29,7 @@ def parse_args(argv=None):
     parser.add_argument('--timesteps', type=int, default=config.TIMESTEPS)
     parser.add_argument('--reward', choices=REWARDS, default='r1')
     parser.add_argument('--generations', type=int, default=config.GENERATIONS)
-    parser.add_argument('--population', type=int)
+    parser.add_argument('--population', type=int, default=config.POPULATION)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--resume', type=Path, metavar='FOLDER', help='Continue from the last consistent training checkpoint.')
     mode.add_argument('--pretrained', type=Path, metavar='MODEL', help='Start a new run from a model of the same algorithm.')

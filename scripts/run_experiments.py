@@ -1,30 +1,22 @@
-import argparse
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from src.training.config import SEED
+from src.training.agents import AGENTS
 from src.game.config import SCENARIOS
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('seed', nargs='?', type=int, default=SEED, help='Algorithm seed; defaults to SEED in src/training/config.py.')
-    args = parser.parse_args(argv)
-    
-    if args.seed < 0:
-        parser.error('seed must be non-negative.')
-    
-    for agent in ('neat', 'dqn', 'ppo'):
+def main():
+    for agent in AGENTS:
         extension = 'pkl' if agent == 'neat' else 'zip'
         for scenario in SCENARIOS:
-            folder = f'models/{agent}/s{scenario}/seed{args.seed}'
+            folder = f'models/{agent}/s{scenario}'
             subprocess.run([
                 sys.executable, 'train.py',
                 '--agent', agent, '--scenario', str(scenario),
-                '--seed', str(args.seed), '--output', folder,
+                '--output', folder,
             ], cwd=ROOT, check=True)
             subprocess.run([
                 sys.executable, 'evaluate.py',
