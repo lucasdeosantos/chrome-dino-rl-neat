@@ -25,6 +25,7 @@ def parse_args(argv=None):
     parser.add_argument('--seed', type=int, default=config.SEED)
     parser.add_argument('--render', nargs='?', const='8x', choices=RENDER_SPEEDS)
     parser.add_argument('--max-steps', type=int, default=MAX_STEPS)
+    parser.add_argument('--stop-at-max-steps', action='store_true', help='Stop when reaches max-steps, NEAT finishes the generation.')
     parser.add_argument('--timesteps', type=int, default=config.TIMESTEPS)
     parser.add_argument('--reward', choices=REWARDS, default='r1')
     parser.add_argument('--generations', type=int, default=config.GENERATIONS)
@@ -80,7 +81,7 @@ def run(args):
         raise ValueError('The output folder is not empty. Choose another folder to preserve the previous training run.')
     
     args.output.mkdir(parents=True, exist_ok=True)
-    fields = ('agent', 'scenario', 'seed', 'max_steps')
+    fields = ('agent', 'scenario', 'seed', 'max_steps', 'stop_at_max_steps')
     metadata = {key: getattr(args, key) for key in fields}
     packages = ['gymnasium', 'numpy']
     

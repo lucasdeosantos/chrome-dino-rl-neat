@@ -4,14 +4,15 @@ from ..game.physics import DINO_X
 
 
 REWARDS = {
-    'r1': { 'steps': 0.1, 'collision': -5, 'jump_or_duck': -0.01 },
-    'r2': { 'steps': 0.1 },
-    'r3': { 'steps': 0.1, 'collision': -5, 'jump': -0.01 },
-    'r4': { 'steps': 0.1, 'collision': -5 },
-    'r5': { 'steps': 0.1, 'collision': -5, 'obstaclePassed': 1 },
-    'r6': { 'steps': 0.1, 'collision': -5, 'successfulDuck': 1 },
-    'r7': { 'steps': 0.1, 'collision': -5, 'successfulDuck': 1, 'unnecessaryJump': -0.05 },
-    'r8': { 'steps': 0.1, 'collision': -5, 'successfulDuck': 1, 'successfulJump': 0.5 },
+    'r1': { 'steps': 0.1 },
+    'r2': { 'steps': 0.1, 'collision': -5 },
+    'r3': { 'steps': 0.1, 'collision': -5, 'obstaclePassed': 1 },
+    'r4': { 'steps': 0.1, 'collision': -5, 'obstaclePassed': 1, 'jump_or_duck': -0.01 },
+    'r5': { 'steps': 0.1, 'collision': -5, 'jump_or_duck': -0.01 },
+    'r6': { 'steps': 0.1, 'collision': -5, 'jump': -0.01 },
+    'r7': { 'steps': 0.1, 'collision': -5, 'successfulDuck': 1 },
+    'r8': { 'steps': 0.1, 'collision': -5, 'successfulDuck': 1, 'unnecessaryJump': -0.05 },
+    'r9': { 'steps': 0.1, 'collision': -5, 'successfulDuck': 1, 'successfulJump': 0.5 },
 }
 
 

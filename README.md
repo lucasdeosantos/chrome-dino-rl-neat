@@ -120,10 +120,11 @@ python train.py --agent neat --scenario 1 --output models/neat-new-model
 | `--output PASTA` | Pasta de saída do modelo |
 | `--seed N` | Semente aleatória do algoritmo (padrão: 42) |
 | `--timesteps N` | Passos do PPO/DQN (padrão: 10 milhões) |
-| `--reward [r1..r8]` | Função de recompensa do PPO/DQN (padrão: r1) |
+| `--reward [r1..r9]` | Função de recompensa do PPO/DQN (padrão: r1) |
 | `--generations N` | Gerações do NEAT (padrão: 100) |
 | `--population N` | Tamanho da população do NEAT (padrão: 50) |
 | `--max-steps N` | Limite de passos por partida (padrão: 36000 = 10 min simulados) |
+| `--stop-at-max-steps` | Encerra o treino quando um modelo atinge o limite definido em --max-steps. No NEAT, conclui a geração antes de encerrar |
 | `--resume PASTA` | Continua um treino interrompido com os mesmos parâmetros |
 | `--pretrained PASTA` | Novo treino a partir de um modelo do mesmo algoritmo, exige uma nova pasta de saída |
 | `--render [normal\|2x\|4x\|8x]` | Visualização gráfica do treino (velocidade padrão: 8x) |
@@ -134,16 +135,13 @@ Hiperparâmetros do RL ficam em `src/training/config.py`, a configuração do NE
 
 As funções de recompensa são definidas em `src/training/rewards.py`. O NEAT usa a pontuação da partida como *fitness* e não é afetado por `--reward`.
 
-A função de recompensa padrão $r_1$ incentiva o agente a sobreviver pelo maior tempo possível, evitando colisões e ações desnecessárias.
+A função de recompensa padrão $r_1$ é calculada por:
 
 $$
-r_1 = 0{,}1 \cdot s - 5 \cdot c - 0{,}01 \cdot a
+r_1 = 0{,}1 \cdot s
 $$
 
-Onde:
-- $s$ (steps): número de passos sobrevividos (equivalente a pontuação).
-- $c$ (collision): indica se ocorreu uma colisão (0 ou 1).
-- $a$ (actions): número de ações de pular ou agachar.
+Onde $s$ é o número de passos sobrevividos, que são convertidos na pontuação conforme a velocidade do cenário.
 
 ### Retomada e pré-treinamento
 

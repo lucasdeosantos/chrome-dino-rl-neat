@@ -37,6 +37,9 @@ class TrainingCallback(BaseCallback):
             if done:
                 self.record_episode(info)
         
+        if self.args.stop_at_max_steps and self.success:
+            return False
+        
         return self.viewer is None or not self.viewer.stopped
 
     def record_episode(self, info):
@@ -122,11 +125,15 @@ def save_results(args, model, env, callback, interrupted):
                            'points': env.game.get_points()}
     
     write_json(args.output / 'training_episodes.json', callback.history)
+    
+    stop_reason = 'interrupted' if interrupted else 'step_limit'
+    if args.stop_at_max_steps and callback.success:
+        stop_reason = 'max_steps_reached'
+   
     write_json(args.output / 'training_result.json',
                {'agent': args.agent, 'completed_steps': model.num_timesteps,
                 'best_points': callback.best_score, 'success': callback.success,
-                'stop_reason': 'interrupted' if interrupted else 'step_limit',
-                'interrupted': interrupted, 'partial_episode': partial_episode})
+                'stop_reason': stop_reason, 'partial_episode': partial_episode})
 
 
 def train_rl(args):
@@ -175,7 +182,7 @@ def train_rl(args):
         remaining = args.timesteps - model.num_timesteps
         
         try:
-            if remaining > 0:
+            if remaining > 0 and not (args.stop_at_max_steps and callback.success):
                 model.learn(total_timesteps=remaining, callback=callback,
                             reset_num_timesteps=args.resume is None)
         except StopRendering:
@@ -189,7 +196,10 @@ def train_rl(args):
         
         print(f'Completed steps: {model.num_timesteps}/{args.timesteps}')
         print(f'Interrupted: {interrupted}', flush=True)
-        
+
+        if args.stop_at_max_steps and callback.success:
+            print('Stop reason: max_steps_reached', flush=True)
+
         if interrupted:
             print(f'Resumable checkpoint: step {checkpoint_step}', flush=True)
         

@@ -184,6 +184,9 @@ def train_neat(args):
                 checkpoint()
             
             while population.generation < args.generations:
+                if args.stop_at_max_steps and success:
+                    break
+                
                 population.run(evaluate_genomes, 1)
                 checkpoint()
         
@@ -197,14 +200,18 @@ def train_neat(args):
         print(f'Completed generations: {completed_generations}/{args.generations}')
         print(f'Interrupted: {interrupted}')
         print(f'Total training steps: {total_steps}', flush=True)
+        
+        stop_reason = 'interrupted' if interrupted else 'generation_limit'
+        if args.stop_at_max_steps and success and not interrupted:
+            stop_reason = 'max_steps_reached'
+       
         write_json(args.output / 'training_episodes.json', history)
         write_json(args.output / 'training_result.json',
                    {'agent': 'neat', 'completed_steps': total_steps, 'completed_generations': completed_generations,
                     'generation_reached': population.generation + (1 if interrupted else 0),
                     'evaluated_individuals': len(history), 'best_points': best_score if best is not None else None,
-                    'success': success, 'interrupted': interrupted,
-                    'partial_individuals': partial_individuals if interrupted else None,
-                    'stop_reason': 'interrupted' if interrupted else 'generation_limit'})
+                    'success': success, 'partial_individuals': partial_individuals if interrupted else None,
+                    'stop_reason': stop_reason})
         return best
     finally:
         if viewer is not None:
