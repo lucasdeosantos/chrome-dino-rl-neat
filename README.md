@@ -24,7 +24,7 @@ python play.py --versus models/neat/s3/best.pkl --scenario 3
 | Opção | Descrição |
 |---|---|
 | `--scenario [1, 2, 3, 4]` | Cenário (padrão: 4) |
-| `--versus ARQUIVO` | Joga contra um agente |
+| `--versus ARQUIVO`, `--vs ARQUIVO` | Joga contra um agente |
 
 ### Cenários
 

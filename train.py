@@ -6,10 +6,9 @@ from pathlib import Path
 from src.training import config
 from src.game.config import SCENARIOS
 from src.training.agents import AGENTS
-from src.training.config import MAX_STEPS, TRAINING_SEED_START, TEST_SEEDS
 from src.training.rewards import REWARDS
-from src.training.checkpoints import resume_settings
 from src.training.renderer import RENDER_SPEEDS
+from src.training.checkpoints import resume_settings
 from src.utils import read_json, write_json
 from src.logs import start_log, finish_log
 
@@ -18,29 +17,31 @@ ROOT = Path(__file__).resolve().parent
 
 
 def parse_args(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--agent', choices=AGENTS)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--scenario', type=int, choices=SCENARIOS)
     parser.add_argument('--seed', type=int, default=config.SEED)
     parser.add_argument('--render', nargs='?', const='8x', choices=RENDER_SPEEDS)
-    parser.add_argument('--max-steps', type=int, default=MAX_STEPS)
+    parser.add_argument('--max-steps', type=int, default=config.MAX_STEPS)
     parser.add_argument('--stop-at-max-steps', action='store_true', help='Stop when reaches max-steps, NEAT finishes the generation.')
     parser.add_argument('--timesteps', type=int, default=config.TIMESTEPS)
     parser.add_argument('--reward', choices=REWARDS, default='r1')
     parser.add_argument('--generations', type=int, default=config.GENERATIONS)
     parser.add_argument('--population', type=int, default=config.POPULATION)
+    
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--resume', type=Path, metavar='FOLDER', help='Continue from the last consistent training checkpoint.')
     mode.add_argument('--pretrained', type=Path, metavar='MODEL', help='Start a new run from a model of the same algorithm.')
     
     args = parser.parse_args(argv)
+    
     args.rollout_steps = config.ROLLOUT_STEPS
     args.batch_size = config.BATCH_SIZE
     args.learning_starts = config.LEARNING_STARTS
     args.buffer_size = config.BUFFER_SIZE
     args.neat_config = config.NEAT_CONFIG
-    args.training_seed_start = TRAINING_SEED_START
+    args.training_seed_start = config.TRAINING_SEED_START
     args.checkpoint_every = config.CHECKPOINT_EVERY
 
     if args.resume is not None:
@@ -65,10 +66,21 @@ def parse_args(argv=None):
     if args.pretrained is not None:
         if not args.pretrained.is_file():
             parser.error('Pretrained model not found.')
+        
         source = args.pretrained.parent
         if (source / 'run.json').exists() and read_json(source / 'run.json')['agent'] != args.agent:
             parser.error('--pretrained must use the same algorithm as --agent.')
     
+    for name in ('max_steps', 'timesteps', 'generations'):
+        if getattr(args, name) <= 0:
+            parser.error(f'--{name.replace("_", "-")} must be positive.')
+
+    if args.seed < 0:
+        parser.error('--seed must be non-negative.')
+
+    if args.population < 2:
+        parser.error('--population must be at least 2.')
+
     return args
 
 
@@ -111,10 +123,8 @@ def run(args):
     if args.pretrained is not None:
         metadata['pretrained'] = str(args.pretrained.resolve())
     
-    metadata['training_seed_start'] = args.training_seed_start
-    metadata['test_seeds'] = {'start': TEST_SEEDS[0], 'end': TEST_SEEDS[-1]}
     metadata['versions'] = {name: version(name) for name in packages}
-    write_json(args.output / 'run.json', metadata, compact_keys=('test_seeds',))
+    write_json(args.output / 'run.json', metadata)
     execute_training(args)
 
 

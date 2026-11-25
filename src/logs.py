@@ -3,7 +3,6 @@ from pathlib import Path
 import os
 import re
 import sys
-import warnings
 
 
 def open_log(model_path, operation):
@@ -20,7 +19,7 @@ def open_log(model_path, operation):
     
     name = '_'.join(parts) or 'model'
     name = re.sub(r'[^\w.-]+', '_', name)
-    folder = root / 'results' / 'logs'
+    folder = root / 'logs'
     folder.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().astimezone().strftime('%Y-%m-%d_%H-%M-%S')
     log_path = folder / f'{name}_{operation}_{stamp}.log'
@@ -41,13 +40,9 @@ def start_log(model_path, operation):
     path, file = open_log(model_path, operation)
     print(f'log: {os.path.relpath(path).replace(os.sep, "/")}', flush=True)
     sys.stderr.flush()
-    log = {'path': path, 'file': file, 'stdout': sys.stdout, 'stderr': sys.stderr,
-           'stdout_fd': os.dup(1), 'stderr_fd': os.dup(2),
-           'warning_filters': warnings.filters[:]}
+    log = {'path': path, 'file': file, 'stdout': sys.stdout, 'stderr': sys.stderr, 'stdout_fd': os.dup(1), 'stderr_fd': os.dup(2)}
     
     try:
-        warnings.filterwarnings('ignore', message=r'CUDA initialization: The NVIDIA driver on your system is too old',
-                                category=UserWarning, module=r'torch\.cuda(?:\.|$)')
         os.dup2(file.fileno(), 1)
         os.dup2(file.fileno(), 2)
         sys.stdout = file
@@ -64,7 +59,6 @@ def finish_log(log):
         print(f'Finished: {datetime.now().astimezone().isoformat(timespec="seconds")}', file=log['file'])
         log['file'].flush()
     finally:
-        warnings.filters[:] = log['warning_filters']
         sys.stdout = log['stdout']
         sys.stderr = log['stderr']
         os.dup2(log['stdout_fd'], 1)

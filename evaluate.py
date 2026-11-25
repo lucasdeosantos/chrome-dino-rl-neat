@@ -6,12 +6,12 @@ from src.game.config import SCENARIOS
 from src.training.config import MAX_STEPS, TEST_SEEDS
 from src.training.agents import AGENTS, load_agent
 from src.training.renderer import TrainingRenderer, RENDER_SPEEDS
-from src.training.evaluation import evaluate
+from src.training.evaluation import evaluate, save_evaluation
 from src.logs import start_log, finish_log
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--agent', choices=AGENTS, required=True)
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--scenario', type=int, choices=SCENARIOS, required=True)
@@ -19,8 +19,9 @@ def main():
     parser.add_argument('--max-steps', type=int, default=MAX_STEPS)
     
     args = parser.parse_args()
+    
     if args.max_steps <= 0:
-        parser.error('max-steps must be positive.')
+        parser.error('--max-steps must be positive.')
     
     log = start_log(args.model, 'evaluation')
     
@@ -32,7 +33,8 @@ def main():
         viewer = TrainingRenderer(args.render) if args.render else None
         
         try:
-            evaluation = evaluate(args.agent, model, args.scenario, args.max_steps, TEST_SEEDS, progress=True, viewer=viewer)
+            evaluation = evaluate(args.agent, model, args.scenario, args.max_steps, TEST_SEEDS, progress=True, viewer=viewer, include_steps=True)
+            save_evaluation(args.agent, args.model, args.scenario, args.max_steps, TEST_SEEDS, evaluation)
             results = evaluation['results']
             interrupted = evaluation['interrupted']
             mean = sum(r['points'] for r in results) / len(results) if results else None

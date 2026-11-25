@@ -146,8 +146,7 @@ def train_neat(args):
         
         if viewer is None:
             for _, genome in genomes:
-                result = evaluate('neat', neat_network(genome, config), args.scenario,
-                                  args.max_steps, [map_seed], include_steps=True)['results'][0]
+                result = evaluate('neat', neat_network(genome, config), args.scenario, args.max_steps, [map_seed], include_steps=True)['results'][0]
                 records.append(record_result(genome, result))
         else:
             results, partial_individuals = evaluate_population(genomes, config, args.scenario, args.max_steps, map_seed, viewer)

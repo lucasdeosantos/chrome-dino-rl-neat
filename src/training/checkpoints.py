@@ -93,7 +93,7 @@ def resume_settings(args):
     args.output = args.resume
     fields = ('agent', 'scenario', 'seed', 'max_steps',
               'timesteps', 'batch_size', 'rollout_steps', 'learning_starts',
-              'buffer_size', 'generations', 'population', 'training_seed_start',
+              'buffer_size', 'generations', 'population',
               'checkpoint_every', 'stop_at_max_steps')
     
     for name in fields:

@@ -8,15 +8,12 @@ from src.game.physics import SIMULATION_STEP_DURATION
 from src.game.config import RUN, JUMP, DUCK, RENDER_FPS
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Chrome Dino clone")
-    parser.add_argument("--scenario", type=int, choices=SCENARIOS, default=DEFAULT_SCENARIO)
-    parser.add_argument("--versus", type=Path, help="Play against a saved model on the same track.")
-    return parser.parse_args()
-
-
 def main():
-    args = parse_args()
+    parser = argparse.ArgumentParser(allow_abbrev=False)
+    parser.add_argument("--scenario", type=int, choices=SCENARIOS, default=DEFAULT_SCENARIO)
+    parser.add_argument("--versus", "--vs", type=Path, help="Play against a saved model on the same track.")
+    
+    args = parser.parse_args()
 
     game = DinoGame(args.scenario)
     opponent = None
