@@ -27,10 +27,7 @@ def load_start_config(args):
 
 def create_population(args):
     config = load_start_config(args)
-    
-    if args.population is not None:
-        config.pop_size = args.population
-
+    config.pop_size = args.population
     tracker = getattr(config.genome_config, 'innovation_tracker', None)
     population = neat.Population(config, seed=args.seed)
     
@@ -205,12 +202,14 @@ def train_neat(args):
             stop_reason = 'max_steps_reached'
        
         write_json(args.output / 'training_episodes.json', history)
+        
+        species_sizes = {str(sid): len(species.members) for sid, species in sorted(population.species.species.items())}
         write_json(args.output / 'training_result.json',
                    {'agent': 'neat', 'completed_steps': total_steps, 'completed_generations': completed_generations,
                     'generation_reached': population.generation + (1 if interrupted else 0),
                     'evaluated_individuals': len(history), 'best_points': best_score if best is not None else None,
-                    'success': success, 'partial_individuals': partial_individuals if interrupted else None,
-                    'stop_reason': stop_reason})
+                    'success': success, 'species_count': len(species_sizes), 'species_sizes': species_sizes,
+                    'partial_individuals': partial_individuals if interrupted else None, 'stop_reason': stop_reason})
         return best
     finally:
         if viewer is not None:
